@@ -6,16 +6,22 @@ then
   exit -1
 fi
 
+tmp=$(mktemp -d)
+cp $3 $tmp
+
 LOCAL=$1
 REMOTE=$2
-BASE=$3
+BASE=$(ls $tmp/*)
 MERGED=$4
 
-last_modif=$(stat -c %Y $BASE)
-meld $LOCAL $BASE $REMOTE
+echo $BASE
+base_creation=$(stat -c %Y $BASE)
+meld --diff $LOCAL $MERGED $REMOTE --diff $LOCAL $BASE $REMOTE
 meld_exit_code=$?
 
-if [ $(stat -c %Y $BASE) -ne $last_modif ]
-then
-  cp $BASE $MERGED
-fi 
+base_modif=$(stat -c %Y $BASE)
+merged_modif=$(stat -c %Y $MERGED)
+
+[ $base_modif -gt $base_creation ] && [ $base_modif -gt $merged_modif ] && cp $BASE $MERGED
+
+rm -r $tmp
