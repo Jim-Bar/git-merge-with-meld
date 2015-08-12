@@ -22,6 +22,13 @@ meld_exit_code=$?
 base_modif=$(stat -c %Y $BASE)
 merged_modif=$(stat -c %Y $MERGED)
 
-[ $base_modif -gt $base_creation ] && [ $base_modif -gt $merged_modif ] && cp $BASE $MERGED
+if [ $base_modif -gt $base_creation ] && [ $base_modif -gt $merged_modif ] 
+then
+
+  if whiptail --yesno "The common ancestor has been edited, do you want to use it as the result of the merge ?" 20 60 ;then
+    cp $BASE $MERGED
+  fi
+
+fi
 
 rm -r $tmp
