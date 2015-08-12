@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ ! $# -eq 4 ];
+then
+  echo "usage : $0 <local> <remote> <base> <merged>"
+  exit -1
+fi
+
+LOCAL=$1
+REMOTE=$2
+BASE=$3
+MERGED=$4
+
+last_modif=$(stat -c %Y $BASE)
+meld $LOCAL $BASE $REMOTE
+meld_exit_code=$?
+
+if [ $(stat -c %Y $BASE) -ne $last_modif ]
+then
+  cp $BASE $MERGED
+fi 
